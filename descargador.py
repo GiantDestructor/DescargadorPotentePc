@@ -29,16 +29,21 @@ def sinFf(opcion, directorio):
 def conFf(opcion, directorio):
     ydl_opts= {
         'ignoreerrors': {True},
+        'format': 'bestvideo+m4a/best', 
+        'merge_output_format' : 'mp4',
+        'paths' : {"home" : directorio},
+         'postprocessors':
+           [{
+                'key': 'FFmpegVideoConvertor',  #asegurar video en mp4
+                'preferedformat': 'mp4'
+                
+            }
+            
+            ]
     }
+    return ydl_opts
     
 def bienvenida():
-    print("")
-    print("")
-    print("")
-    print("")
-    print("")
-    print("")
-    print("")
     print(r'  _____  ______  _____  _____          _____   _____          _____   ____  _____  ')
     print(r' |  __ \|  ____|/ ____|/ ____|   /\   |  __ \ / ____|   /\   |  __ \ / __ \|  __ \ ')
     print(r' | |  | | |__  | (___ | |       /  \  | |__) | |  __   /  \  | |  | | |  | | |__) |')
@@ -53,21 +58,22 @@ directorio = input(r"Directorio: ")
 while programa == True:
     
     
+    # 1
     URLS = input("--> URL ") 
-    print("Si quiere descargar videos de alta calidad con audio, requiere tener descargado Ffmpeg ¿Lo tiene?")
-    print("No es necesario Ffmpeg para el uso del programa. s/n")
-    ffm = input("")
-
     print("--> ¿Video o Audio? ")
     print("v/a")
     opcion = input("")
 
-    # hacer que con ffmpeg se extraiga el mejor audio y el mejor video y se junten
-    if (ffm == "n"):
-        ydl_opts = sinFf(opcion, directorio)
-    elif(ffm == "s"):
+    if (opcion =="v"):
+        print("Si quiere descargar videos de alta calidad, requiere tener descargado Ffmpeg ¿Lo tiene?\n s/n")
+        ffm = input("")
+    
+
+    ydl_opts = sinFf(opcion, directorio)
+
+    if(ffm == "s"):
         #si
-        print("si")
+        ydl_opts = conFf(opcion,directorio)
     
          
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:

@@ -7,39 +7,66 @@ import yt_dlp
 #raiz.title("Descarador!")
 #raiz.mainloop()
 #mainframe = ttk.Frame(raiz, padding="3 3 12 12")
-def sinFf(opcion, directorio):
-    if (opcion == "a"):
+def descargar_audio(directorio):
+        nombre_del_artista = ""
+        nombre_del_album = ""
+        albumSN = input("¿Quiere descargar un album? \n (s/n)")
+        if (albumSN == "s"):
+            nombre_del_album= input("---> Nombre del Album ")
+            nombre_del_artista= input("---> Nombre del Artista ")
+        else: pass
         ydl_opts = {
         'ignoreerrors': {True},
         'format': 'm4a/bestaudio/best', 'paths': {"home": directorio},
-        'postprocessors': [{  
+        'postprocessors': 
+        [{  
             'key': 'FFmpegExtractAudio',
-         'preferredcodec': 'm4a',
-        }]
+         'preferredcodec': 'mp3'
+        },
+        
+        {
+            'key': 'FFmpegMetadata',
+        
+        },
+        {
+            'key': 'EmbedThumbnail'
+        }
+        ],
+        'postprocessor_args': [  
+            '-metadata', f'artist={nombre_del_artista}',
+            '-metadata', f'album={nombre_del_album}',
+        ],
+        
+        "writethumbnail" : True
+        
     }
-    else:
-         ydl_opts = {
-        'ignoreerrors': {True},
-        'format': 'mp4/best',
-        'paths': {"home": directorio}
+        return ydl_opts
+def descargar_video_sinFfmpeg(directorio):
+
+    ydl_opts = {
+    'ignoreerrors': {True},
+    'format': 'mp4/best',
+    'paths': {"home": directorio}
          }
     
     return ydl_opts
 
-def conFf(opcion, directorio):
+def conFf(directorio):
     ydl_opts= {
-        'ignoreerrors': {True},
-        'format': 'bestvideo+m4a/best', 
+        'ignoreerrors': True,
+        'format': 'bv*[vcodec^=avc1][height<=1080]+m4a/best', #una forma de descargar solo la versión de 1080 o mejor pero no en Av01 o Av1 y descargar el mejor audio y convertirlo en wav y luego los juntamos.
         'merge_output_format' : 'mp4',
         'paths' : {"home" : directorio},
          'postprocessors':
-           [{
+           [                
+            {                
                 'key': 'FFmpegVideoConvertor',  #asegurar video en mp4
                 'preferedformat': 'mp4'
-                
             }
             
-            ]
+            ],
+            
+    
     }
     return ydl_opts
     
@@ -60,20 +87,23 @@ while programa == True:
     
     # 1
     URLS = input("--> URL ") 
-    print("--> ¿Video o Audio? ")
-    print("v/a")
-    opcion = input("")
+    opcion = input("--> ¿Video o Audio? \n (v/a) ")
 
-    if (opcion =="v"):
-        print("Si quiere descargar videos de alta calidad, requiere tener descargado Ffmpeg ¿Lo tiene?\n s/n")
-        ffm = input("")
+    if(opcion == "a"):
+        ydl_opts = descargar_audio(directorio)
+    # que pasa cuando queremos video
+    elif (opcion =="v"):
+        ffm = input("Si quiere descargar videos de alta calidad, requiere tener descargado Ffmpeg ¿Lo tiene?\n s/n")
+        if(ffm == "s"):
+         #si
+            ydl_opts = conFf(directorio)
+        else:
+            ydl_opts = descargar_video_sinFfmpeg(directorio)
+
+    # Que pasa cuando queremos audio
     
 
-    ydl_opts = sinFf(opcion, directorio)
-
-    if(ffm == "s"):
-        #si
-        ydl_opts = conFf(opcion,directorio)
+   
     
          
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
